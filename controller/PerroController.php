@@ -130,10 +130,11 @@ class PerroController
             if ($sexo1 == $sexo2) {
                 echo "No pueden procrear, son del mismo sexo.";
             } else {
+                //identificamos la madre y el padre para las futuras condiciones
                 $madre = ($sexo1 == "H") ? $id1 : $id2;
                 $padre = ($sexo1 == "H") ? $id2 : $id1;
 
-                Perro::agregarCachorro($padre, $madre);
+                Perro::añadirCachorrito($padre, $madre);
                 //refresco para que vuelva al proyecto principal
                 header("refresh:1; url=/proyectos/MVCPerros/index.php");
             }

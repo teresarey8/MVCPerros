@@ -177,83 +177,85 @@ class Perro
     }
     public static function obtenerSexos($id1, $id2)
     {
-        try{
-        // Conexión a la base de datos
-        $conexion = new PDO("mysql:host=localhost;dbname=animales", "root", "");
-        //le tengo que preguntar al modelo cual es el sexo de ambos perros, por que el modelo es el unico que 
-        //tiene la informacion de la base de datos
-        $sql = "SELECT id, sexo 
+        try {
+            // Conexión a la base de datos
+            $conexion = new PDO("mysql:host=localhost;dbname=animales", "root", "");
+            //le tengo que preguntar al modelo cual es el sexo de ambos perros, por que el modelo es el unico que 
+            //tiene la informacion de la base de datos
+            $sql = "SELECT id, sexo 
                 FROM perros 
                 WHERE id IN (:id1, :id2)";
 
-        $stmt = $conexion->prepare($sql);
-        $stmt->bindParam(':id1', $id1, PDO::PARAM_INT);
-        $stmt->bindParam(':id2', $id2, PDO::PARAM_INT);
+            $stmt = $conexion->prepare($sql);
+            $stmt->bindParam(':id1', $id1, PDO::PARAM_INT);
+            $stmt->bindParam(':id2', $id2, PDO::PARAM_INT);
 
-        // Ejecutar la consulta
-        $stmt->execute();
+            // Ejecutar la consulta
+            $stmt->execute();
 
-        // Obtener los resultados
-        $sexos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
-        return $sexos; // Devuelve un array con los resultados
-    } catch (PDOException $e) {
-        echo "Error en la consulta: " . $e->getMessage();
-        return [];
+            // Obtener los resultados
+            $sexos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return $sexos; // Devuelve un array con los resultados
+        } catch (PDOException $e) {
+            echo "Error en la consulta: " . $e->getMessage();
+            return [];
+        }
     }
-    }
-    public static function agregarCachorro($padre, $madre)
-{
-    try {
-        // Conexión a la base de datos
-        $conexion = new PDO("mysql:host=localhost;dbname=animales", "root", "");
-        $conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    public static function añadirCachorrito($padre, $madre)
+    {
+        try {
+            // Conexión a la base de datos
+            $conexion = new PDO("mysql:host=localhost;dbname=animales", "root", "");
+            $conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        // Obtener información de los progenitores
-        $sql = "SELECT id, nombre, raza, color, sexo 
+            // Obtener información de los progenitores
+            $sql = "SELECT id, nombre, raza, color, sexo 
                 FROM perros 
                 WHERE id IN (:padre, :madre)";
 
-        $stmt = $conexion->prepare($sql);
-        $stmt->bindParam(':padre', $padre, PDO::PARAM_INT);
-        $stmt->bindParam(':madre', $madre, PDO::PARAM_INT);
-        $stmt->execute();
+            $stmt = $conexion->prepare($sql);
+            $stmt->bindParam(':padre', $padre, PDO::PARAM_INT);
+            $stmt->bindParam(':madre', $madre, PDO::PARAM_INT);
+            $stmt->execute();
 
-        $progenitores = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $progenitores = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Verificar que se encontraron ambos progenitores
-        if (count($progenitores) != 2) {
-            return "Uno o ambos IDs no existen.";
-        }
+            // Verificar que se encontraron ambos progenitores
+            if (count($progenitores) != 2) {
+                return "Uno o ambos IDs no existen.";
+            }
 
-        // Identificar padre y madre
-        $papa = ($progenitores[0]['id'] == $padre) ? $progenitores[0] : $progenitores[1];
-        $mama = ($progenitores[0]['id'] == $madre) ? $progenitores[0] : $progenitores[1];
+            // Identificar padre y madre
+            $papa = ($progenitores[0]['id'] == $padre) ? $progenitores[0] : $progenitores[1];
+            $mama = ($progenitores[0]['id'] == $madre) ? $progenitores[0] : $progenitores[1];
 
-        // Condiciones del nuevo cachorrito
-        $nombreCachorro = $papa['nombre'] . " Junior";
-        $razaCachorro = $mama['raza'];
-        $colorCachorro = $mama['color'];
-        $pesoCachorro = 1; // Peso fijo
-        $sexoCachorro = (strlen($papa['nombre']) > strlen($mama['nombre'])) ? $papa['sexo'] : $mama['sexo'];
+            // Condiciones del nuevo cachorrito
+            $nombreCachorro = $papa['nombre'] . " Junior";
+            $razaCachorro = $mama['raza'];
+            $colorCachorro = $mama['color'];
+            $pesoCachorro = 1; // Peso fijo
+            //el sexo del progenitor cuyo nombre sea más largo (tenga más caracteres).
+            //strlen me devuelve la longitud de un string
+            $sexoCachorro = (strlen($papa['nombre']) > strlen($mama['nombre'])) ? $papa['sexo'] : $mama['sexo'];
 
-        // Insertar el cachorro en la base de datos
-        $sqlInsert = "INSERT INTO perros (nombre, raza, color, peso, sexo) 
+            // Insertar el cachorro en la base de datos
+            $sqlInsert = "INSERT INTO perros (nombre, raza, color, peso, sexo) 
                       VALUES (:nombre, :raza, :color, :peso, :sexo)";
 
-        $stmtInsert = $conexion->prepare($sqlInsert);
-        $stmtInsert->bindParam(':nombre', $nombreCachorro, PDO::PARAM_STR);
-        $stmtInsert->bindParam(':raza', $razaCachorro, PDO::PARAM_STR);
-        $stmtInsert->bindParam(':color', $colorCachorro, PDO::PARAM_STR);
-        $stmtInsert->bindParam(':peso', $pesoCachorro, PDO::PARAM_INT);
-        $stmtInsert->bindParam(':sexo', $sexoCachorro, PDO::PARAM_STR);
-        $stmtInsert->execute();
+            $stmtInsert = $conexion->prepare($sqlInsert);
+            $stmtInsert->bindParam(':nombre', $nombreCachorro, PDO::PARAM_STR);
+            $stmtInsert->bindParam(':raza', $razaCachorro, PDO::PARAM_STR);
+            $stmtInsert->bindParam(':color', $colorCachorro, PDO::PARAM_STR);
+            $stmtInsert->bindParam(':peso', $pesoCachorro, PDO::PARAM_INT);
+            $stmtInsert->bindParam(':sexo', $sexoCachorro, PDO::PARAM_STR);
+            $stmtInsert->execute();
 
-        return "Cachorro agregado con éxito: $nombreCachorro";
+            return "Cachorro agregado con éxito: $nombreCachorro";
 
-    } catch (PDOException $e) {
-        return "Error al agregar el cachorro: " . $e->getMessage();
+        } catch (PDOException $e) {
+            return "Error al agregar el cachorro: " . $e->getMessage();
+        }
     }
-}
 
 }

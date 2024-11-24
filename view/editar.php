@@ -49,7 +49,7 @@
 
             <!-- Botón de envío -->
             <div class="text-center">
-                <button type="submit" class="btn btn-primary">Editar coche</button>
+                <button type="submit" class="btn btn-primary">Editar perro</button>
             </div>
         </form>
     </div>
